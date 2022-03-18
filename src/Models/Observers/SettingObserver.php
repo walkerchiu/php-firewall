@@ -122,16 +122,17 @@ class SettingObserver
      */
     public function deleted($entity)
     {
-        if (!config('php-firewall.soft_delete')) {
-            $entity->forceDelete();
-        }
-
         if ($entity->isForceDeleting()) {
             $entity->langs()->withTrashed()
                             ->forceDelete();
-            foreach ($entity->items as $item) {
-                $item->withTrashed()->forceDelete();
+            $records = $entity->items()->withTrashed()->get();
+            foreach ($records as $recoed) {
+                $recoed->forceDelete();
             }
+        }
+
+        if (!config('php-firewall.soft_delete')) {
+            $entity->forceDelete();
         }
     }
 
